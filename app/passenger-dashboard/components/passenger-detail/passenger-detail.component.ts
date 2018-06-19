@@ -1,39 +1,32 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core'
-import {Passenger} from "../../models/passenger.interface";
+import { Component, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 
+import { Passenger } from '../../models/passenger.interface';
 
 @Component({
   selector: 'passenger-detail',
   styleUrls: ['passenger-detail.component.scss'],
   template: `
     <div>
-      <span
-        class="status"
-        [class.checked-in]="this.detail.checkedIn"
-      ></span>
-
+      <span class="status" [class.checked-in]="detail.checkedIn"></span>
       <div *ngIf="editing">
-        <input
-          type="text"
-          [value]="this.detail.fullname"
+        <input 
+          type="text" 
+          [value]="detail.fullname"
           (input)="onNameChange(name.value)"
-          #name
-        />
+          #name>
       </div>
-
       <div *ngIf="!editing">
-        {{this.detail.fullname}}
+        {{ detail.fullname }}
       </div>
-
       <div class="date">
-        Check in date:
-        {{this.detail.checkInDate ? (this.detail.checkInDate | date: 'yMMMMd') : 'Not checked in'}}
+        Check in date: 
+        {{ detail.checkInDate ? (detail.checkInDate | date: 'yMMMMd' | uppercase) : 'Not checked in' }}
       </div>
       <div class="children">
-        Children: {{this.detail.children?.length || 0}}
+        Children: {{ detail.children?.length || 0 }}
       </div>
-      <button (click)="toogleEdit()">
-        {{editing ? 'Done' : 'Edit'}}
+      <button (click)="toggleEdit()">
+        {{ editing ? 'Done' : 'Edit' }}
       </button>
       <button (click)="onRemove()">
         Remove
@@ -42,6 +35,7 @@ import {Passenger} from "../../models/passenger.interface";
   `
 })
 export class PassengerDetailComponent implements OnChanges {
+
   @Input()
   detail: Passenger;
 
@@ -49,33 +43,29 @@ export class PassengerDetailComponent implements OnChanges {
   edit: EventEmitter<Passenger> = new EventEmitter<Passenger>();
 
   @Output()
-  delete: EventEmitter<Passenger> = new EventEmitter<Passenger>();
+  remove: EventEmitter<Passenger> = new EventEmitter<Passenger>();
 
   editing: boolean = false;
+  
+  constructor() {}
 
-
-  ngOnChanges(event) {
-    if (event.detail) { //detail has been changed, this  should re-render
-      this.detail = {...event.detail.currentValue}
+  ngOnChanges(changes) {
+    if (changes.detail) {
+      this.detail = Object.assign({}, changes.detail.currentValue);
     }
   }
-
+  
   onNameChange(value: string) {
     this.detail.fullname = value;
   }
-
-
-  toogleEdit() {
+  
+  toggleEdit() {
     if (this.editing) {
       this.edit.emit(this.detail);
     }
     this.editing = !this.editing;
   }
-
   onRemove() {
-    this.delete.emit(this.detail);
-  }
-
-  constructor() {
+    this.remove.emit(this.detail);
   }
 }
