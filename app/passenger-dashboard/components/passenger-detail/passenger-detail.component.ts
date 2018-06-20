@@ -21,10 +21,7 @@ import { Passenger } from '../../models/passenger.interface';
       <div class="date">
         Check in date: 
         {{ detail.checkInDate ? (detail.checkInDate | date: 'yMMMMd' | uppercase) : 'Not checked in' }}
-      </div>
-      <div class="children">
-        Children: {{ detail.children?.length || 0 }}
-      </div>
+      </div>      
       <button (click)="toggleEdit()">
         {{ editing ? 'Done' : 'Edit' }}
       </button>
@@ -46,7 +43,7 @@ export class PassengerDetailComponent implements OnChanges {
   remove: EventEmitter<Passenger> = new EventEmitter<Passenger>();
 
   editing: boolean = false;
-  
+
   constructor() {}
 
   ngOnChanges(changes) {
@@ -54,11 +51,11 @@ export class PassengerDetailComponent implements OnChanges {
       this.detail = Object.assign({}, changes.detail.currentValue);
     }
   }
-  
+
   onNameChange(value: string) {
     this.detail.fullname = value;
   }
-  
+
   toggleEdit() {
     if (this.editing) {
       this.edit.emit(this.detail);
