@@ -1,4 +1,10 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+
+interface Nav {
+  link: string,
+  name: string,
+  exact: boolean
+}
 
 
 @Component({
@@ -6,10 +12,37 @@ import { Component } from '@angular/core';
   styleUrls: ['app.component.scss'],
   template: `
     <div class="app">
-      <passenger-viewer></passenger-viewer>
+      <nav class="nav">
+        <a
+          *ngFor="let item of nav"
+          [routerLink]="item.link"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:item.exact}"
+        >
+          {{item.name}}
+        </a>
+
+      </nav>
+      <router-outlet></router-outlet>
     </div>
   `
 })
 export class AppComponent {
-
+  nav: Nav[] = [
+    {
+      link: '/',
+      name: 'home',
+      exact: true
+    },
+    {
+      link: '/oops',
+      name: '404',
+      exact: false
+    },
+    {
+      link: '/passengers',
+      name: 'passengers',
+      exact: true
+    }
+  ]
 }

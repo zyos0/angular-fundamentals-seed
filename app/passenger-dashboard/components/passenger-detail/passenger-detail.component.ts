@@ -1,6 +1,6 @@
-import { Component, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 
-import { Passenger } from '../../models/passenger.interface';
+import {Passenger} from '../../models/passenger.interface';
 
 @Component({
   selector: 'passenger-detail',
@@ -9,8 +9,8 @@ import { Passenger } from '../../models/passenger.interface';
     <div>
       <span class="status" [class.checked-in]="detail.checkedIn"></span>
       <div *ngIf="editing">
-        <input 
-          type="text" 
+        <input
+          type="text"
           [value]="detail.fullname"
           (input)="onNameChange(name.value)"
           #name>
@@ -19,14 +19,17 @@ import { Passenger } from '../../models/passenger.interface';
         {{ detail.fullname }}
       </div>
       <div class="date">
-        Check in date: 
+        Check in date:
         {{ detail.checkInDate ? (detail.checkInDate | date: 'yMMMMd' | uppercase) : 'Not checked in' }}
-      </div>      
+      </div>
       <button (click)="toggleEdit()">
         {{ editing ? 'Done' : 'Edit' }}
       </button>
       <button (click)="onRemove()">
         Remove
+      </button>
+      <button (click)="goToPassenger()">
+        View
       </button>
     </div>
   `
@@ -40,16 +43,24 @@ export class PassengerDetailComponent implements OnChanges {
   edit: EventEmitter<Passenger> = new EventEmitter<Passenger>();
 
   @Output()
+  view: EventEmitter<Passenger> = new EventEmitter<Passenger>();
+
+  @Output()
   remove: EventEmitter<Passenger> = new EventEmitter<Passenger>();
 
   editing: boolean = false;
 
-  constructor() {}
+  constructor() {
+  }
 
   ngOnChanges(changes) {
     if (changes.detail) {
       this.detail = Object.assign({}, changes.detail.currentValue);
     }
+  }
+
+  goToPassenger() {
+    this.view.emit(this.detail)
   }
 
   onNameChange(value: string) {
@@ -62,6 +73,7 @@ export class PassengerDetailComponent implements OnChanges {
     }
     this.editing = !this.editing;
   }
+
   onRemove() {
     this.remove.emit(this.detail);
   }
