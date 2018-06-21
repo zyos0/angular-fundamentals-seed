@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {Passenger} from "../../models/passenger.interface";
 import {Baggage} from "../../models/baggage.interface";
 
@@ -7,7 +7,7 @@ import {Baggage} from "../../models/baggage.interface";
   selector: 'passenger-form',
   styleUrls: ['passenger-form.component.scss'],
   template: `
-    <form #form="ngForm" novalidate>
+    <form (ngSubmit)="handleSubmit(form.value, form.value)" #form="ngForm" novalidate>
       Form!
       {{detail | json}}
       <div>
@@ -15,8 +15,13 @@ import {Baggage} from "../../models/baggage.interface";
         <input
           type="text"
           name="fullname"
+          #fullname="ngModel"
+          required
           [ngModel]="detail?.fullname"
         >
+        <div *ngIf="fullname.errors?.required && fullname.dirty" class="error">
+          Passenger name is required
+        </div>
       </div>
 
 
@@ -25,8 +30,13 @@ import {Baggage} from "../../models/baggage.interface";
         <input
           type="number"
           name="id"
+          #id="ngModel"
+          required
           [ngModel]="detail?.id"
         >
+        <div *ngIf="id.errors?.required && id.dirty" class="error">
+          Passenger id name is required
+        </div>
       </div>
 
       <div>
@@ -65,28 +75,17 @@ import {Baggage} from "../../models/baggage.interface";
             [selected]="item.key===detail?.baggage"
           >
             {{item.value}}
-            
-
-          </option>
-        </select>
-
-        <select
-          name="baggage"
-          [ngModel]="detail?.baggage">
-          <option
-            *ngFor="let item of baggage"
-            [ngValue]="item.key"            
-          >
-            {{item.value}}
 
 
           </option>
         </select>
+
+
       </div>
 
-
-      {{form.value | json}}
-
+      <button type="submit" [disabled]="form.invalid">
+        Update passenger
+      </button>
     </form>
 
   `
@@ -95,24 +94,33 @@ export class PassengerFormComponent {
   @Input()
   detail: Passenger;
 
+  @Output()
+  update: EventEmitter<Passenger> = new EventEmitter<Passenger>();
+
   baggage: Baggage[] = [
     {
       key: 'none',
       value: 'No baggage'
     },
     {
-      key:'hand-only',
-      value:'Hand baggage'
+      key: 'hand-only',
+      value: 'Hand baggage'
     },
     {
       key: 'hold-only',
       value: 'Hold baggage'
     },
     {
-      key:'hand-hold',
-      value:'Hand and hold baggage'
+      key: 'hand-hold',
+      value: 'Hand and hold baggage'
     }
-  ]
+  ];
+
+  handleSubmit(passenger: Passenger, isValid: boolean) {
+    if (isValid) {
+      this.update.emit(passenger)
+    }
+  }
 
   toggleCheckIn(checkedIn: boolean) {
     if (checkedIn) {
